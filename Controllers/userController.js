@@ -1,5 +1,6 @@
 import { json } from "express";
 import { userModel } from "../models/userModel.js";
+import { generateToken } from "../utils/generateToken.js";
 
 export const registerUser = async (req, res) => {
   try {
@@ -112,18 +113,27 @@ export const loginUser = async (req, res) => {
         message: "invalid credentials!!1",
       });
     }
-    const isPasswordValid = await foundUser.isPasswordValid(reqBody.password);
+    const isPasswordMatched = await foundUser.isPasswordValid(reqBody.password);
+    if (isPasswordMatched) {
+      const token = await generateToken({ _id: foundUser?._id });
 
-    if (isPasswordValid) {
+      if (!token) {
+        return res.json({
+          success: "something went wrong",
+        });
+      }
+
       const userData = {
         name: foundUser.name,
         email: foundUser.email,
         address: foundUser.address,
         phoneNumber: foundUser.phoneNumber,
+        token: token,
       };
 
       res.json({
         success: true,
+        data: userData,
         message: `Welcome back$(foundUser.name)`,
       });
     }
