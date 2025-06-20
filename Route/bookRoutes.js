@@ -7,13 +7,13 @@ import {
   deleteBookController,
 } from "../Controllers/bookControllers.js";
 import { checkAuthorization } from "../middleware/checkAuthorization.js";
-import { checkpermission } from "../middleware/CheckPermission.js";
+import { checkStaffLevelPermissions } from "../middleware/CheckPermission.js";
 
 const bookRouter = express.Router();
 
 bookRouter
   .route("/").get(checkAuthorization, getBookController) 
-  .post(checkAuthorization, checkpermission, createBookController);
+  .post(checkAuthorization, checkStaffLevelPermissions, createBookController);
 
 bookRouter
   .route("/:id") .put(updateBookController)
